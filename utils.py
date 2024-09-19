@@ -2,7 +2,9 @@ import streamlit as st
 import os
 import pandas as pd
 from gpt import generate_text_to_image
-
+from PIL import Image
+from io import BytesIO
+import zipfile
 
 ROOT_SAVE_FOLDER = "saved_folders"
 os.makedirs(ROOT_SAVE_FOLDER, exist_ok=True)
@@ -70,6 +72,25 @@ def create_folder_page():
             else:
                 st.warning("Please enter a folder name.")
 
+# Function to convert image to bytes for downloading
+def get_image_bytes(image_path):
+    img = Image.open(image_path)
+    img_byte_arr = BytesIO()
+    img.save(img_byte_arr, format='PNG')  # You can change the format if needed
+    img_byte_arr = img_byte_arr.getvalue()
+    return img_byte_arr
+
+
+def create_zip_from_folder(saved_data):
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+        for _, row in saved_data.iterrows():
+            image_path = row["Image_Path"]
+            img_name = os.path.basename(image_path)  # Get the image file name
+            zip_file.write(image_path, img_name)  # Add image to zip
+    zip_buffer.seek(0)  # Move the buffer position to the beginning
+    return zip_buffer
+
 # Page: View Folder and Items
 def view_folder_page():
     
@@ -100,18 +121,45 @@ def view_folder_page():
         if not saved_data.empty:
             columns_per_row = 4  # Display 4 images per row
             for i in range(0, len(saved_data), columns_per_row):
-                cols = st.columns(columns_per_row)
+                cols = st.columns(columns_per_row)  # Create 4 columns
                 for j, (index, row) in enumerate(saved_data.iloc[i:i + columns_per_row].iterrows()):
-                    with cols[j]:
+                    with cols[j]:  # Ensure each image and button are in the same column
+                        # Display the image
                         st.image(row["Image_Path"], caption=f"Prompt: {row['Prompt']} (Age: {row['Age']}, Resolution: {row['Resolution']})", width=300)
-                        if st.button(f"🗑️ Delete Image {index + 1}", key=f"delete_{index}"):
-                            delete_prompt_image(row["Image_Path"], saved_data, index, current_folder)
-                            st.rerun()  # Refresh after deletion
+                        
+                        image_bytes = get_image_bytes(row["Image_Path"])
+                        
+                        
+                        col21, col22, _ = st.columns([1, 1, 1])
+                        with col21:
+                            st.download_button(
+                                label="Download",
+                                data=image_bytes,
+                                file_name=f"image_{index + 1}.png",  # You can customize the file name
+                                mime="image/png"
+                            )
+                        with col22:
+                            # Align the button at the bottom of the container
+                            if st.button(f"🗑️ Delete", key=f"delete_{index}"):
+                                delete_prompt_image(row["Image_Path"], saved_data, index, current_folder)
+                                st.rerun()  # Refresh after deletion
+
+            st.write('')
+            st.write('')
+            st.write('')
+            
+            zip_buffer = create_zip_from_folder(saved_data)
+            st.download_button(
+                label="Download Folder",
+                data=zip_buffer,
+                file_name=f"{current_folder}.zip",
+                mime="application/zip"
+            )
         else:
             st.write("No images in this folder.")
         
         # Button to delete the folder
-        if st.button(f"🗑️ Delete Folder '{folder}'"):
+        if st.button(f"🗑️ Delete Folder"):
             delete_folder(folder)
             del st.session_state.selected_folder
             st.rerun()

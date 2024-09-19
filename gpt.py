@@ -113,7 +113,7 @@ def generate_text_to_image(prompt, age, size, output_folder):
     print(f"Correction Prompt: {correction_prompt}\n")
     print(f"GPT4's Corrected Prompt: {corrected_prompt}\n")
     print(f"Coloring Page Prompt: {coloring_page_prompt}\n")
-    filename = get_filename(output_folder, model_name, age)
+    filename = get_filename(output_folder, prompt, age)
     print(f"filename: {filename}")
     
     save_image_from_url(output_url, filename)
