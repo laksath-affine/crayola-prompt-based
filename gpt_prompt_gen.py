@@ -1,18 +1,16 @@
 import os
 from openai import AzureOpenAI
-from dotenv import load_dotenv
-
-load_dotenv()
+import streamlit as st
 
 completion_client = AzureOpenAI(
-    azure_endpoint = os.getenv("AZURE_OPENAI_AI_PRACTICES_ENDPOINT"),
-    api_key = os.getenv('AZURE_OPENAI_AI_PRACTICES_API_KEY'),
+    azure_endpoint = st.secrets["AZURE_OPENAI_AI_PRACTICES_ENDPOINT"],
+    api_key = st.secrets['AZURE_OPENAI_AI_PRACTICES_API_KEY'],
     api_version = "2024-02-01"
 )
 
 dalle_client = AzureOpenAI(
-    azure_endpoint = os.getenv("AZURE_OPENAI_ALLBIRDS_ENDPOINT"),
-    api_key = os.getenv('AZURE_OPENAI_ALLBIRDS_API_KEY'),
+    azure_endpoint = st.secrets["AZURE_OPENAI_ALLBIRDS_ENDPOINT"],
+    api_key = st.secrets['AZURE_OPENAI_ALLBIRDS_API_KEY'],
     api_version = "2024-02-01"
 )
 

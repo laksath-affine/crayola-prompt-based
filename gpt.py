@@ -5,12 +5,8 @@ import requests
 from PIL import Image
 from io import BytesIO
 from gpt_prompt_gen import get_text_api_result, generate_dalle_3_image
-import base64
-import json
 from datetime import datetime
-from dotenv import load_dotenv
-
-load_dotenv()
+import streamlit as st
 
 def generate_coloring_page_child(prompt):
     return (f"Design a very simple, young child-friendly black and white coloring page based on the theme: '{prompt}'. "
@@ -38,9 +34,9 @@ def generate_correction_prompt(prompt):
 
 def dalle_text_to_image(prompt, model_name, size):
     client = AzureOpenAI(
-        api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
+        api_key=st.secrets["AZURE_OPENAI_API_KEY"], 
         api_version="2024-02-01",
-        azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        azure_endpoint = st.secrets["AZURE_OPENAI_ENDPOINT"]
     )
 
     response = client.images.generate(
