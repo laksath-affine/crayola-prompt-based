@@ -8,20 +8,23 @@ ROOT_SAVE_FOLDER = "saved_folders"
 os.makedirs(ROOT_SAVE_FOLDER, exist_ok=True)
 
 def login_page():
-    st.title("Login")
-
+   
     # Input fields for username and password
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+    _, col2, _ = st.columns([0.5, 1, 0.5])
+    with col2:
+        st.title("Login")
 
-    if st.button("Login"):
-        
-        if username == st.secrets['UNAME'] and password == st.secrets['PASSWD']:
-            st.session_state.logged_in = True
-            st.success("Login successful!")
-            st.rerun()  # Refresh the page after login
-        else:
-            st.error("Invalid username or password. Please try again.")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login"):
+            
+            if username == st.secrets['UNAME'] and password == st.secrets['PASSWD']:
+                st.session_state.logged_in = True
+                st.success("Login successful!")
+                st.rerun()  # Refresh the page after login
+            else:
+                st.error("Invalid username or password. Please try again.")
 
 # Helper function to save prompt and image info in a CSV file
 def save_prompt_image(prompt, age, resolution, img_path, folder):
@@ -55,20 +58,24 @@ def delete_folder(folder_name):
 
 # Page: Create Folder
 def create_folder_page():
-    st.title("Create a New Folder")
-
-    new_folder_name = st.text_input("Enter folder name:")
-    if st.button("Create Folder"):
-        if new_folder_name:
-            new_folder_path = os.path.join(ROOT_SAVE_FOLDER, new_folder_name)
-            os.makedirs(new_folder_path, exist_ok=True)
-            st.success(f"Folder '{new_folder_name}' created successfully!")
-        else:
-            st.warning("Please enter a folder name.")
+    _, col1, _ = st.columns([0.5, 1, 0.5])
+    with col1:
+        st.title("Create a New Folder")
+        new_folder_name = st.text_input("Enter folder name:")
+        if st.button("Create Folder"):
+            if new_folder_name:
+                new_folder_path = os.path.join(ROOT_SAVE_FOLDER, new_folder_name)
+                os.makedirs(new_folder_path, exist_ok=True)
+                st.success(f"Folder '{new_folder_name}' created successfully!")
+            else:
+                st.warning("Please enter a folder name.")
 
 # Page: View Folder and Items
 def view_folder_page():
-    st.title("View Folders and Items")
+    
+    _, col1, _ = st.columns([0.7, 1, 0.5])
+    with col1:
+        st.title("View Folders and Items")
 
     folders = [f for f in os.listdir(ROOT_SAVE_FOLDER) if os.path.isdir(os.path.join(ROOT_SAVE_FOLDER, f))]
     
@@ -115,7 +122,9 @@ def add_item_page():
         st.warning("Please select a folder from 'View Folder' page.")
         return
 
-    st.title(f"Add Item to Folder: {st.session_state.selected_folder}")
+    _, col1, _ = st.columns([0.7, 1, 0.5])
+    with col1:
+        st.title(f"Add Item to Folder: {st.session_state.selected_folder}")
 
     age = st.selectbox("Select Age Group:", ["child", "teen", "adult"])
     prompt = st.text_input("Enter the image prompt:")
