@@ -28,10 +28,11 @@ def create_message_text(question):
 
 def get_text_api_result(question):
     completion = completion_client.chat.completions.create(
-      model="gpt-4o-05-13",
+    #   model="gpt-4o-05-13",
+      model="gpt-4o-08-06",
       messages = create_message_text(question),
       temperature=0.7,
-      max_tokens=3000,
+    #   max_tokens=3000,
       top_p=0.95,
       frequency_penalty=0,
       presence_penalty=0,
